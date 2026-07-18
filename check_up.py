@@ -13,10 +13,6 @@ Usage:
 
 import sys, os, subprocess, platform, shutil, glob, socket, tempfile, webbrowser, datetime
 
-# ── Force UTF-8 stdout/stderr on Windows ────────────────────────────
-# Without this, the emoji / box-drawing characters used throughout this
-# script raise UnicodeEncodeError on Windows consoles that default to a
-# non-UTF-8 codepage (cp1252 / cp437). This must run before any print().
 if sys.platform == "win32":
     for _stream_name in ("stdout", "stderr"):
         _stream = getattr(sys, _stream_name)
