@@ -1,0 +1,53 @@
+# Save this file as: .github/workflows/build-executables.yml
+# in a repo that also contains check_up.py at the repo root.
+#
+# Builds a standalone executable for Windows, macOS, and Linux in
+# parallel, then uploads each as a downloadable artifact.
+#
+# Trigger it either by pushing to main, or manually from the
+# Actions tab ("Run workflow").
+
+name: Build check_up executables
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: check_up.exe
+            build_path: dist/check_up.exe
+          - os: macos-latest
+            artifact_name: check_up-macos
+            build_path: dist/check_up
+          - os: ubuntu-latest
+            artifact_name: check_up-linux
+            build_path: dist/check_up
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build executable
+        run: pyinstaller --onefile --name check_up --console check_up.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.build_path }}
